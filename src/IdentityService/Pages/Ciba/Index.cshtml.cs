@@ -19,7 +19,7 @@ public class IndexModel(IBackchannelAuthenticationInteractionService backchannel
 
     public async Task<IActionResult> OnGet(string id)
     {
-        LoginRequest = await backchannelAuthenticationInteractionService.GetLoginRequestByInternalIdAsync(id);
+        LoginRequest = await backchannelAuthenticationInteractionService.GetLoginRequestByInternalIdAsync(id, CancellationToken.None);
         if (LoginRequest == null)
         {
             logger.LogWarning("Invalid backchannel login id {id}", id);

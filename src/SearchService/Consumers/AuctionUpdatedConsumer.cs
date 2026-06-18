@@ -14,7 +14,7 @@ public class AuctionUpdatedConsumer(IMapperBase mapper) : IConsumer<AuctionUpdat
 
         var item = mapper.Map<Item>(context.Message);
 
-        var result = await DB.Update<Item>()
+        var result = await DB.Default.Update<Item>()
             .Match(a => a.ID == context.Message.Id)
             .ModifyOnly(x => new
             {

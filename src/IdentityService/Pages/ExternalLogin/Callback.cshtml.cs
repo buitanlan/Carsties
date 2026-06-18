@@ -1,9 +1,9 @@
 using System.Security.Claims;
+using Duende.IdentityModel;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Test;
-using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -89,8 +89,8 @@ public class Callback(IIdentityServerInteractionService interaction,
         var returnUrl = result.Properties.Items["returnUrl"] ?? "~/";
 
         // check if external login is in the context of an OIDC request
-        var context = await interaction.GetAuthorizationContextAsync(returnUrl);
-        await events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, user.SubjectId, user.Username, true, context?.Client.ClientId));
+        var context = await interaction.GetAuthorizationContextAsync(returnUrl, CancellationToken.None);
+        await events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, user.SubjectId, user.Username, true, context?.Client.ClientId), CancellationToken.None);
 
         if (context != null)
         {

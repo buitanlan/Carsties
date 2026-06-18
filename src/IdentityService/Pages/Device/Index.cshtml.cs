@@ -55,7 +55,7 @@ public class Index(IDeviceFlowInteractionService interaction,
 
     public async Task<IActionResult> OnPost()
     {
-        var request = await interaction.GetAuthorizationContextAsync(Input.UserCode);
+        var request = await interaction.GetAuthorizationContextAsync(Input.UserCode, CancellationToken.None);
         if (request == null) return RedirectToPage("/Home/Error/Index");
 
         ConsentResponse grantedConsent = null;
@@ -65,11 +65,11 @@ public class Index(IDeviceFlowInteractionService interaction,
         {
             grantedConsent = new ConsentResponse
             {
-                Error = AuthorizationError.AccessDenied
+                Error = InteractionError.AccessDenied
             };
 
             // emit event
-            await eventService.RaiseAsync(new ConsentDeniedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues));
+            await eventService.RaiseAsync(new ConsentDeniedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues), CancellationToken.None);
         }
         // user clicked 'yes' - validate the data
         else if (Input.Button == "yes")
@@ -91,7 +91,7 @@ public class Index(IDeviceFlowInteractionService interaction,
                 };
 
                 // emit event
-                await eventService.RaiseAsync(new ConsentGrantedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues, grantedConsent.ScopesValuesConsented, grantedConsent.RememberConsent));
+                await eventService.RaiseAsync(new ConsentGrantedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues, grantedConsent.ScopesValuesConsented, grantedConsent.RememberConsent), CancellationToken.None);
             }
             else
             {
@@ -106,7 +106,7 @@ public class Index(IDeviceFlowInteractionService interaction,
         if (grantedConsent != null)
         {
             // communicate outcome of consent back to identityserver
-            await interaction.HandleRequestAsync(Input.UserCode, grantedConsent);
+            await interaction.HandleRequestAsync(Input.UserCode, grantedConsent, CancellationToken.None);
 
             // indicate that's it ok to redirect back to authorization endpoint
             return RedirectToPage("/Device/Success");
@@ -120,7 +120,7 @@ public class Index(IDeviceFlowInteractionService interaction,
 
     private async Task<ViewModel> BuildViewModelAsync(string userCode, InputModel model = null)
     {
-        var request = await interaction.GetAuthorizationContextAsync(userCode);
+        var request = await interaction.GetAuthorizationContextAsync(userCode, CancellationToken.None);
         if (request != null)
         {
             return CreateConsentViewModel(model, request);

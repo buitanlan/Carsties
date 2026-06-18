@@ -9,7 +9,7 @@ public class AuctionFinishedConsumer : IConsumer<AuctionFinished>
 {
     public async Task Consume(ConsumeContext<AuctionFinished> context)
     {
-        var auction = await DB.Find<Item>().OneAsync(context.Message.AuctionId);
+        var auction = await DB.Default.Find<Item>().OneAsync(context.Message.AuctionId);
 
         if (context.Message.ItemSold)
         {
@@ -19,6 +19,6 @@ public class AuctionFinishedConsumer : IConsumer<AuctionFinished>
 
         auction.Status = "Finished";
 
-        await auction.SaveAsync();
+        await DB.Default.SaveAsync(auction);
     }
 }

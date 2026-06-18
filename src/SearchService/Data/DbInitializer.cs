@@ -17,13 +17,13 @@ public class DbInitializer
         await DB.InitAsync("SearchDb", MongoClientSettings
             .FromConnectionString(app.Configuration.GetConnectionString("MongoDbConnection")));
 
-        await DB.Index<Item>()
+        await DB.Default.Index<Item>()
             .Key(x => x.Make, KeyType.Text)
             .Key(x => x.Model, KeyType.Text)
             .Key(x => x.Color, KeyType.Text)
             .CreateAsync();
 
-        var count = await DB.CountAsync<Item>();
+        var count = await DB.Default.CountAsync<Item>();
 
         using var scope = app.Services.CreateScope();
 
@@ -33,6 +33,6 @@ public class DbInitializer
 
         Console.WriteLine(items.Count + " returned from the auction service");
 
-        if (items.Count > 0) await DB.SaveAsync(items);
+        if (items.Count > 0) await DB.Default.SaveAsync(items);
     }
 }

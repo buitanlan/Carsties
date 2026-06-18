@@ -24,6 +24,6 @@ public class AllModel(IBackchannelAuthenticationInteractionService backchannelAu
 
     public async Task OnGet()
     {
-        Logins = await backchannelAuthenticationInteractionService.GetPendingLoginRequestsForCurrentUserAsync();
+        Logins = await backchannelAuthenticationInteractionService.GetPendingLoginRequestsForCurrentUserAsync(CancellationToken.None);
     }
 }

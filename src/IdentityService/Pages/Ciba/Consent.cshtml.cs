@@ -40,7 +40,7 @@ public class Consent(IBackchannelAuthenticationInteractionService interaction,
     public async Task<IActionResult> OnPost()
     {
         // validate return url is still valid
-        var request = await interaction.GetLoginRequestByInternalIdAsync(Input.Id);
+        var request = await interaction.GetLoginRequestByInternalIdAsync(Input.Id, CancellationToken.None);
         if (request == null || request.Subject.GetSubjectId() != User.GetSubjectId())
         {
             logger.LogError("Invalid id {id}", Input.Id);
@@ -55,7 +55,7 @@ public class Consent(IBackchannelAuthenticationInteractionService interaction,
             result = new CompleteBackchannelLoginRequest(Input.Id);
 
             // emit event
-            await events.RaiseAsync(new ConsentDeniedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues));
+            await events.RaiseAsync(new ConsentDeniedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues), CancellationToken.None);
         }
         // user clicked 'yes' - validate the data
         else if (Input?.Button == "yes")
@@ -76,7 +76,7 @@ public class Consent(IBackchannelAuthenticationInteractionService interaction,
                 };
 
                 // emit event
-                await events.RaiseAsync(new ConsentGrantedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues, result.ScopesValuesConsented, false));
+                await events.RaiseAsync(new ConsentGrantedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues, result.ScopesValuesConsented, false), CancellationToken.None);
             }
             else
             {
@@ -91,7 +91,7 @@ public class Consent(IBackchannelAuthenticationInteractionService interaction,
         if (result != null)
         {
             // communicate outcome of consent back to identityserver
-            await interaction.CompleteLoginRequestAsync(result);
+            await interaction.CompleteLoginRequestAsync(result, CancellationToken.None);
 
             return RedirectToPage("/Ciba/All");
         }
@@ -103,7 +103,7 @@ public class Consent(IBackchannelAuthenticationInteractionService interaction,
 
     private async Task<ViewModel> BuildViewModelAsync(string id, InputModel model = null)
     {
-        var request = await interaction.GetLoginRequestByInternalIdAsync(id);
+        var request = await interaction.GetLoginRequestByInternalIdAsync(id, CancellationToken.None);
         if (request != null && request.Subject.GetSubjectId() == User.GetSubjectId())
         {
             return CreateConsentViewModel(model, id, request);

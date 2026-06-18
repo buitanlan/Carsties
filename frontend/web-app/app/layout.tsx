@@ -1,5 +1,6 @@
 import './globals.css';
 import Navbar from './nav/Navbar';
+import React from 'react';
 
 export const metadata = {
 	title: 'Carsties',

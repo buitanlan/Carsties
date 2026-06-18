@@ -21,15 +21,15 @@ public class Index(
         
     public async Task OnGet()
     {
-        var grants = await interaction.GetAllUserGrantsAsync();
+        var grants = await interaction.GetAllUserGrantsAsync(CancellationToken.None);
 
         var list = new List<GrantViewModel>();
         foreach (var grant in grants)
         {
-            var client = await clients.FindClientByIdAsync(grant.ClientId);
+            var client = await clients.FindClientByIdAsync(grant.ClientId, CancellationToken.None);
             if (client != null)
             {
-                var listResources = await resources.FindResourcesByScopeAsync(grant.Scopes);
+                var listResources = await resources.FindResourcesByScopeAsync(grant.Scopes, CancellationToken.None);
 
                 var item = new GrantViewModel()
                 {
@@ -60,8 +60,8 @@ public class Index(
 
     public async Task<IActionResult> OnPost()
     {
-        await interaction.RevokeUserConsentAsync(ClientId);
-        await events.RaiseAsync(new GrantsRevokedEvent(User.GetSubjectId(), ClientId));
+        await interaction.RevokeUserConsentAsync(ClientId, CancellationToken.None);
+        await events.RaiseAsync(new GrantsRevokedEvent(User.GetSubjectId(), ClientId), CancellationToken.None);
 
         return RedirectToPage("/Grants/Index");
     }

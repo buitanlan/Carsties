@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using IdentityModel;
+using Duende.IdentityModel;
 using IdentityService.Data;
 using IdentityService.Models;
 using Microsoft.AspNetCore.Identity;
@@ -35,9 +35,9 @@ public class SeedData
                 throw new Exception(result.Errors.First().Description);
             }
 
-            result = userMgr.AddClaimsAsync(alice, new Claim[]{
-                            new Claim(JwtClaimTypes.Name, "Alice Smith"),
-                        }).Result;
+            result = userMgr.AddClaimsAsync(alice, [
+                new Claim(JwtClaimTypes.Name, "Alice Smith")
+            ]).Result;
             if (!result.Succeeded)
             {
                 throw new Exception(result.Errors.First().Description);
@@ -65,7 +65,7 @@ public class SeedData
             }
 
             result = userMgr.AddClaimsAsync(bob, new Claim[]{
-                            new Claim(JwtClaimTypes.Name, "Bob Smith"),
+                            new(JwtClaimTypes.Name, "Bob Smith"),
                         }).Result;
             if (!result.Succeeded)
             {

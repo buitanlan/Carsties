@@ -1,9 +1,9 @@
+using Duende.IdentityModel;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Extensions;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Validation;
-using IdentityModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -41,7 +41,7 @@ public class Index(IIdentityServerInteractionService interaction,
     public async Task<IActionResult> OnPost()
     {
         // validate return url is still valid
-        var request = await interaction.GetAuthorizationContextAsync(Input.ReturnUrl);
+        var request = await interaction.GetAuthorizationContextAsync(Input.ReturnUrl, CancellationToken.None);
         if (request == null) return RedirectToPage("/Home/Error/Index");
 
         ConsentResponse grantedConsent = null;
@@ -49,10 +49,10 @@ public class Index(IIdentityServerInteractionService interaction,
         // user clicked 'no' - send back the standard 'access_denied' response
         if (Input?.Button == "no")
         {
-            grantedConsent = new ConsentResponse { Error = AuthorizationError.AccessDenied };
+            grantedConsent = new ConsentResponse { Error = InteractionError.AccessDenied };
 
             // emit event
-            await events.RaiseAsync(new ConsentDeniedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues));
+            await events.RaiseAsync(new ConsentDeniedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues), CancellationToken.None);
         }
         // user clicked 'yes' - validate the data
         else if (Input?.Button == "yes")
@@ -74,7 +74,7 @@ public class Index(IIdentityServerInteractionService interaction,
                 };
 
                 // emit event
-                await events.RaiseAsync(new ConsentGrantedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues, grantedConsent.ScopesValuesConsented, grantedConsent.RememberConsent));
+                await events.RaiseAsync(new ConsentGrantedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues, grantedConsent.ScopesValuesConsented, grantedConsent.RememberConsent), CancellationToken.None);
             }
             else
             {
@@ -89,7 +89,7 @@ public class Index(IIdentityServerInteractionService interaction,
         if (grantedConsent != null)
         {
             // communicate outcome of consent back to identityserver
-            await interaction.GrantConsentAsync(request, grantedConsent);
+            await interaction.GrantConsentAsync(request, grantedConsent, CancellationToken.None);
 
             // redirect back to authorization endpoint
             if (request.IsNativeClient() == true)
@@ -109,7 +109,7 @@ public class Index(IIdentityServerInteractionService interaction,
 
     private async Task<ViewModel> BuildViewModelAsync(string returnUrl, InputModel model = null)
     {
-        var request = await interaction.GetAuthorizationContextAsync(returnUrl);
+        var request = await interaction.GetAuthorizationContextAsync(returnUrl, CancellationToken.None);
         if (request != null)
         {
             return CreateConsentViewModel(model, returnUrl, request);

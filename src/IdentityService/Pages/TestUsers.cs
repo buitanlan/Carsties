@@ -4,9 +4,9 @@
 
 using System.Security.Claims;
 using System.Text.Json;
+using Duende.IdentityModel;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Test;
-using IdentityModel;
 
 namespace IdentityService.Pages;
 
@@ -26,7 +26,7 @@ public class TestUsers
                 
             return new List<TestUser>
             {
-                new TestUser
+                new()
                 {
                     SubjectId = "1",
                     Username = "alice",
@@ -42,7 +42,7 @@ public class TestUsers
                         new Claim(JwtClaimTypes.Address, JsonSerializer.Serialize(address), IdentityServerConstants.ClaimValueTypes.Json)
                     }
                 },
-                new TestUser
+                new()
                 {
                     SubjectId = "2",
                     Username = "bob",

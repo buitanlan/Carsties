@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddNpgsql<AuctionDbContext>(builder.Configuration.GetConnectionString("DefaultConnection"));
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(_ => { }, typeof(Program));
 builder.Services.AddMassTransit(x =>
 {
     x.AddEntityFrameworkOutbox<AuctionDbContext>(o =>

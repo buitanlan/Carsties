@@ -36,7 +36,7 @@ namespace IdentityService.Pages.ServerSideSessions
                     DisplayName = DisplayNameFilter,
                     SessionId = SessionIdFilter,
                     SubjectId = SubjectIdFilter
-                });
+                }, CancellationToken.None);
             }
         }
 
@@ -47,7 +47,7 @@ namespace IdentityService.Pages.ServerSideSessions
         {
             await sessionManagementService.RemoveSessionsAsync(new RemoveSessionsContext { 
                 SessionId = SessionId,
-            });
+            }, CancellationToken.None);
             return RedirectToPage("/ServerSideSessions/Index", new { Token, DisplayNameFilter, SessionIdFilter, SubjectIdFilter, Prev });
         }
     }

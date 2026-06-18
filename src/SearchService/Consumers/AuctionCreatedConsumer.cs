@@ -16,6 +16,6 @@ public class AuctionCreatedConsumer(IMapper mapper) : IConsumer<AuctionCreated>
 
         if (item.Model == "Foo") throw new ArgumentException("Cannot sell cars with name of Foo");
 
-        await item.SaveAsync();
+        await DB.Default.SaveAsync(item);
     }
 }

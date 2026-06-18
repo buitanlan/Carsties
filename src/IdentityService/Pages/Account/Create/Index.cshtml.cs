@@ -30,7 +30,7 @@ public class Index(IIdentityServerInteractionService interaction,
     public async Task<IActionResult> OnPost()
     {
         // check if we are in the context of an authorization request
-        var context = await interaction.GetAuthorizationContextAsync(Input.ReturnUrl);
+        var context = await interaction.GetAuthorizationContextAsync(Input.ReturnUrl, CancellationToken.None);
 
         // the user clicked the "cancel" button
         if (Input.Button != "create")
@@ -40,7 +40,7 @@ public class Index(IIdentityServerInteractionService interaction,
                 // if the user cancels, send a result back into IdentityServer as if they 
                 // denied the consent (even if this client does not require consent).
                 // this will send back an access denied OIDC error response to the client.
-                await interaction.DenyAuthorizationAsync(context, AuthorizationError.AccessDenied);
+                await interaction.DenyAuthorizationAsync(context, InteractionError.AccessDenied, CancellationToken.None);
 
                 // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
                 if (context.IsNativeClient())
